@@ -50,6 +50,6 @@ app.get("/upload", async (req: any, res: any) => {
 
 app.use("/uploads", express.static(uploadsDir));
 
-app.listen(3000, () => {
+app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
