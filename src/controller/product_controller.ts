@@ -8,15 +8,25 @@ import path from "path";
 const SERVER_URL = process.env.SERVER_URL;
 
 export const getProducts = async (req: Request, res: Response) => {
-  const products = await AppDataSource.getRepository(Products).find();
-  res.json(products);
+  try {
+    const products = await AppDataSource.getRepository(Products).find();
+    res.json(products);
+  } catch (error: any) {
+    res.json(error);
+    throw new Error(error);
+  }
 };
 
 export const getProduct = async (req: Request, res: Response) => {
-  const product = await AppDataSource.getRepository(Products).findOne({
-    where: { id: Number(req.params.id) },
-  });
-  res.json(product);
+  try {
+    const product = await AppDataSource.getRepository(Products).findOne({
+      where: { id: Number(req.params.id) },
+    });
+    res.json(product);
+  } catch (error) {
+    console.log(error);
+    res.json(error);
+  }
 };
 
 export const addProduct = [
@@ -86,7 +96,7 @@ export const updateProduct = [
         imagesToRemove.forEach((img: string) => {
           const filename = img.split("/").pop() || "";
           console.log(filename);
-          deleteFile(path.join(__dirname, "../uploads"), filename);
+          deleteFile(path.join(__dirname, "../utils/uploads"), filename);
         });
         imageUrls = imageUrls.filter((img) => !imagesToRemove.includes(img));
       }
@@ -112,7 +122,22 @@ export const updateProduct = [
 ];
 
 export const deleteProduct = async (req: Request, res: Response) => {
-  const repository = AppDataSource.getRepository(Products);
-  const result = await repository.delete(req.params.id);
-  res.json(result);
+  try {
+    const repository = AppDataSource.getRepository(Products);
+    const product = await repository.findOne({
+      where: { id: Number(req.params.id) },
+    });
+    const imagesToRemove = product!.images;
+    imagesToRemove.forEach((img: string) => {
+      const filename = img.split("/").pop() || "";
+      console.log(filename);
+      deleteFile(path.join(__dirname, "../utils/uploads"), filename);
+    });
+    const result = await repository.delete(req.params.id);
+    res.json(result);
+  } catch (error: any) {
+    console.error(error);
+    res.json(error);
+    throw new Error(error);
+  }
 };

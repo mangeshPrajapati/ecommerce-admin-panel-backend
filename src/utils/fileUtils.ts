@@ -5,7 +5,7 @@ import { unlink } from "fs/promises";
 import { join } from "path";
 
 // Ensure the uploads directory exists
-export const uploadsDir = path.join(__dirname, "../uploads");
+export const uploadsDir = path.join(__dirname, "/uploads");
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir);
 }
@@ -27,8 +27,13 @@ export async function deleteFile(
 ): Promise<void> {
   try {
     const filePath = join(folderPath, fileName);
-    await unlink(filePath);
-    console.log(`File deleted: ${filePath}`);
+
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      console.log(filePath);
+    } else {
+      console.log(`File ${fileName} does not exist.`);
+    }
   } catch (error) {
     console.error(`Error deleting file: ${error}`);
     throw error;
