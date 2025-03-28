@@ -14,13 +14,12 @@ app.use(cors());
 
 const PORT = process.env.PORT || 3000;
 
-app.use("/api/products", productRoutes);
-
 AppDataSource.initialize()
   .then(() => console.log("Database Connected"))
   .catch((err) => console.error("Database Connection Error", err));
 
 app.use("/uploads", express.static(uploadsDir));
+app.use("/api/products", productRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
